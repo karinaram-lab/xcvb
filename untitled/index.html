@@ -1,0 +1,166 @@
+<style>
+    .floating-button {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        padding: 15px 30px;
+        background-color: #ff4d4d;
+        color: white;
+        text-decoration: none;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+    .floating-button:hover {
+        background-color: #cc0000;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        transform: translateX(-50%) translateY(-2px);
+    }
+</style>
+<a href="https://vk.com/fantikcompot" class="floating-button">
+    Заказать
+</a>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма Отзывов</title>
+    <style>
+        /* Общие стили для контейнера */
+        .reviews-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Стиль формы */
+        #reviewForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Поля ввода и кнопка */
+        #reviewForm input, #reviewForm textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #reviewForm button {
+            padding: 12px;
+            background-color: #007bff; /* Синяя кнопка */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #reviewForm button:hover { background-color: #0056b3; }
+
+        /* Система звёздного рейтинга */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse; /* Звезды справа налево */
+            justify-content: center;
+            gap: 5px;
+        }
+        .star-rating input { display: none; }
+        .star-rating label {
+            font-size: 30px;
+            color: #ddd; /* Серые звезды по умолчанию */
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #ffc107; /* Золотые звезды при выборе */
+        }
+
+        /* Стиль добавленного отзыва */
+        .review-item {
+            border-top: 1px solid #eee;
+            padding: 15px 0;
+            opacity: 0; /* Будет анимировано через JS */
+        }
+        .review-name { font-weight: bold; margin-right: 10px; }
+        .stars-display { color: #ffc107; }
+        .review-text { margin-top: 5px; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="reviews-container">
+        <h3>Оставить отзыв и оценку</h3>
+        <form id="reviewForm">
+            <!-- Звезды -->
+            <div class="star-rating">
+                <input type="radio" id="r5" name="stars" value="5"><label for="r5">★</label>
+                <input type="radio" id="r4" name="stars" value="4"><label for="r4">★</label>
+                <input type="radio" id="r3" name="stars" value="3"><label for="r3">★</label>
+                <input type="radio" id="r2" name="stars" value="2"><label for="r2">★</label>
+                <input type="radio" id="r1" name="stars" value="1"><label for="r1">★</label>
+            </div>
+            
+            <input type="text" id="reviewerName" placeholder="Ваше имя" required>
+            <textarea id="reviewerText" rows="3" placeholder="Ваш отзыв..." required></textarea>
+            <button type="submit">Опубликовать отзыв</button>
+        </form>
+
+        <h3>Все отзывы:</h3>
+        <div id="reviewsList">
+            <!-- Сюда будут добавляться новые отзывы -->
+        </div>
+    </div>
+
+    <!-- Скрипт, который обрабатывает форму -->
+    <script>
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Предотвращаем перезагрузку страницы
+
+            const name = document.getElementById('reviewerName').value;
+            const text = document.getElementById('reviewerText').value;
+            // Получаем значение выбранной звезды (0 если ничего не выбрано)
+            const rating = document.querySelector('input[name="stars"]:checked')?.value || 0;
+
+            if (rating == 0) {
+                alert("Пожалуйста, выберите оценку звездами!");
+                return;
+            }
+
+            // Создаем визуальные звезды для отзыва
+            const starsHtml = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+            // Создаем HTML-элемент нового отзыва
+            const reviewDiv = document.createElement('div');
+            reviewDiv.className = 'review-item';
+            reviewDiv.innerHTML = `
+                <div>
+                    <span class="review-name">${name}</span>
+                    <span class="stars-display">${starsHtml}</span>
+                </div>
+                <p class="review-text">${text}</p>
+            `;
+
+            // Добавляем новый отзыв в начало списка
+            document.getElementById('reviewsList').prepend(reviewDiv);
+            
+            // Запускаем анимацию появления
+            setTimeout(() => {
+                reviewDiv.style.opacity = '1';
+            }, 10);
+
+            // Очищаем форму и сбрасываем звезды
+            this.reset();
+        });
+    </script>
